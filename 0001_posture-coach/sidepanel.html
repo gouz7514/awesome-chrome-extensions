@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posture Coach</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="title">🪑 Posture Coach</div>
+      <span id="scoreBadge" class="score-badge">--</span>
+    </div>
+
+    <!-- 스켈레톤 뷰 (백그라운드 offscreen에서 받은 랜드마크를 그림) -->
+    <div class="camera-wrap">
+      <video id="video" autoplay muted playsinline></video>
+      <canvas id="overlay" width="640" height="480"></canvas>
+      <div id="modeChip" class="mode-chip hidden"></div>
+      <div id="camOverlayMsg" class="cam-overlay-msg">
+        <p>모니터링을 시작하면 자세 감지가 시작돼요.</p>
+        <p class="sub">패널을 닫아도 백그라운드에서 계속 감지합니다.<br />영상은 전부 이 기기 안에서만 처리돼요.</p>
+      </div>
+    </div>
+
+    <!-- 상태 배지 -->
+    <div id="statusBar" class="status-bar" data-state="idle">
+      <span id="statusText">대기 중</span>
+    </div>
+
+    <!-- 메인 컨트롤 -->
+    <div class="content">
+      <div class="btn-row">
+        <button id="startBtn" class="btn btn-primary">모니터링 시작</button>
+        <button id="calibrateBtn" class="btn" disabled>바른 자세 보정</button>
+      </div>
+      <p id="calibrateHint" class="hint">
+        바른 자세로 앉은 뒤 <b>바른 자세 보정</b>을 눌러 기준을 저장하세요.
+      </p>
+      <button id="permBtn" class="link-btn">
+        카메라가 안 켜지나요? → 탭에서 권한 허용하기
+      </button>
+
+      <!-- 감지 모드 -->
+      <div class="section-title">감지 모드</div>
+      <div class="seg" id="modeSeg">
+        <button class="seg-btn" data-mode="auto">자동</button>
+        <button class="seg-btn" data-mode="front">정면</button>
+        <button class="seg-btn" data-mode="side">측면(거북목)</button>
+      </div>
+      <p class="hint">
+        <b>측면</b>은 옆모습에서 귀-어깨 위치로 거북목을, <b>정면</b>은 마주볼 때
+        구부정함을 감지해요. <b>자동</b>은 방향을 스스로 판단합니다. 모드별로 보정 기준이 따로 저장돼요.
+      </p>
+
+      <!-- 설정 -->
+      <div class="section-title">설정</div>
+
+      <label class="slider-row">
+        <div class="slider-label">
+          <span>민감도</span>
+          <small id="sensVal">보통</small>
+        </div>
+        <input id="sensitivity" type="range" min="1" max="5" step="1" value="3" />
+      </label>
+
+      <label class="slider-row">
+        <div class="slider-label">
+          <span>경고까지 지속 시간</span>
+          <small id="holdVal">5초</small>
+        </div>
+        <input id="holdSec" type="range" min="2" max="20" step="1" value="5" />
+      </label>
+
+      <label class="slider-row">
+        <div class="slider-label">
+          <span>반복 알림 간격</span>
+          <small id="repeatVal">10초</small>
+        </div>
+        <input id="repeatSec" type="range" min="3" max="60" step="1" value="10" />
+      </label>
+
+      <div class="row">
+        <span>비프음</span>
+        <button id="beepToggle" class="toggle" data-on="true" aria-label="비프음 토글"></button>
+      </div>
+      <div class="row">
+        <span>데스크톱 알림</span>
+        <button id="notifyToggle" class="toggle" data-on="true" aria-label="알림 토글"></button>
+      </div>
+      <div class="row">
+        <span>화면 붉게 표시 <small style="color: var(--sub)">(현재 탭)</small></span>
+        <button id="overlayToggle" class="toggle" data-on="true" aria-label="화면 표시 토글"></button>
+      </div>
+
+      <!-- 통계 -->
+      <div class="section-title">이번 세션</div>
+      <div class="stats">
+        <div class="stat">
+          <div id="goodPct" class="stat-num">--%</div>
+          <div class="stat-label">바른 자세</div>
+        </div>
+        <div class="stat">
+          <div id="elapsed" class="stat-num">0:00</div>
+          <div class="stat-label">측정 시간</div>
+        </div>
+        <div class="stat">
+          <div id="alertCount" class="stat-num">0</div>
+          <div class="stat-label">경고 횟수</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span id="footerMsg">모델 로딩 준비됨</span>
+    </div>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

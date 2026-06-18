@@ -1,0 +1,329 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #ffffff;
+  --fg: #111827;
+  --sub: #6b7280;
+  --border: #e5e7eb;
+  --accent: #4f46e5;
+  --accent-fg: #ffffff;
+  --good: #16a34a;
+  --warn: #d97706;
+  --bad: #dc2626;
+  --off: #9ca3af;
+  --card-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f2024;
+    --fg: #f3f4f6;
+    --sub: #9ca3af;
+    --border: #34363d;
+    --card-bg: #2a2c33;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.score-badge {
+  min-width: 42px;
+  text-align: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--sub);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.score-badge[data-state="good"] { background: var(--good); color: #fff; }
+.score-badge[data-state="warn"] { background: var(--warn); color: #fff; }
+.score-badge[data-state="bad"] { background: var(--bad); color: #fff; }
+
+/* 카메라 */
+.camera-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  overflow: hidden;
+}
+#video,
+#overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 거울 모드: 사용자가 보기 자연스럽게 좌우 반전 */
+  transform: scaleX(-1);
+}
+/* 스켈레톤 캔버스를 영상 위에 겹침 */
+#overlay {
+  z-index: 1;
+}
+.cam-overlay-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 20px;
+  color: #e5e7eb;
+  background: rgba(0, 0, 0, 0.55);
+}
+.cam-overlay-msg .sub {
+  font-size: 11px;
+  color: #9ca3af;
+}
+.cam-overlay-msg.hidden {
+  display: none;
+}
+
+/* 현재 감지 모드 칩 (영상 위 좌상단) */
+.mode-chip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 2;
+}
+.mode-chip.hidden {
+  display: none;
+}
+
+/* 세그먼트 컨트롤 (모드 선택) */
+.seg {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.seg-btn:last-child {
+  border-right: none;
+}
+.seg-btn:hover:not(.active) {
+  background: var(--card-bg);
+}
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 상태 바 */
+.status-bar {
+  padding: 8px 14px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  background: var(--off);
+}
+.status-bar[data-state="idle"] { background: var(--off); }
+.status-bar[data-state="good"] { background: var(--good); }
+.status-bar[data-state="warn"] { background: var(--warn); }
+.status-bar[data-state="bad"] { background: var(--bad); }
+.status-bar[data-state="error"] { background: var(--bad); }
+
+.content {
+  padding: 14px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+.btn {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.btn:hover:not(:disabled) {
+  background: var(--card-bg);
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  background: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.5;
+}
+.hint.hidden {
+  display: none;
+}
+
+.link-btn {
+  display: block;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.link-btn.flash {
+  animation: flash 1s ease-in-out 3;
+}
+@keyframes flash {
+  50% { color: var(--bad); }
+}
+
+.section-title {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.slider-row {
+  display: block;
+  margin-bottom: 12px;
+}
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.slider-label small {
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.toggle {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  background: var(--off);
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.toggle[data-on="true"] {
+  background: var(--good);
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s;
+}
+.toggle[data-on="true"]::after {
+  transform: translateX(20px);
+}
+
+/* 통계 */
+.stats {
+  display: flex;
+  gap: 8px;
+}
+.stat {
+  flex: 1;
+  background: var(--card-bg);
+  border-radius: 9px;
+  padding: 10px 6px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--sub);
+}
+
+.footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--sub);
+  text-align: center;
+}
